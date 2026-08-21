@@ -1,0 +1,18 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Music Fade In",
+  "version": "1.0.0",
+  "description": "Smoothly fades the volume in every time playback starts or resumes on YouTube Music, so you never get hit with a sudden loud burst.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://music.youtube.com/*"],
+      "js": ["content.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_title": "Fade In Settings"
+  }
+}

@@ -22,7 +22,8 @@
       gainNode = audioCtx.createGain();
       source.connect(gainNode);
       gainNode.connect(audioCtx.destination);
-      gainNode.gain.value = 0.0001;
+      // Only suppress audio if the fade effect is actually enabled
+      gainNode.gain.value = enabled ? 0.0001 : 1.0;
     } catch (e) {
       console.warn('[Audio Fade In] Web Audio setup failed:', e);
       audioCtx = null;
@@ -54,10 +55,13 @@
 
   function setEnabled(val) {
     enabled = val;
-    if (!enabled && gainNode && audioCtx) {
+    if (gainNode && audioCtx) {
       const now = audioCtx.currentTime;
       gainNode.gain.cancelScheduledValues(now);
-      gainNode.gain.setValueAtTime(1.0, now);
+      if (!enabled) {
+        // Restore full volume so audio passes through unaffected
+        gainNode.gain.setValueAtTime(1.0, now);
+      }
     }
   }
 

@@ -1,4 +1,4 @@
-The Problem : 
+# The Problem : 
 
 Whenver I used to listen loud music using my with my airpods, Like say , i was listening to a song at 70% volume. If I needed to pause the music and play again , the music would just sound
 too loud, hurt my ear aswell .That felt very annoying. Because when you hear a music , by progressively increaming the music volume, you dont feel it that way, 
@@ -19,3 +19,26 @@ the logarithmic decibel (dB) scale: a change in decibels represents a multiplica
 So, what this simple of extension does is( i feel like spotify or some other apps do it natively, still not sure ) , it curves the music , every time i play-pause and -play back again, so , the 
 music slowly fades in for the desired amount of time ( say like 3 secs) , so the music progressively increases to the actual speaker volume by the desired time, which sounds
 better and more pleasant than sudden loudness. Thats it! you can give it try aswell, if you like using YT music like me :)
+
+
+# How to Use : 
+
+## clone the repo 
+
+```bash
+git clone https://github.com/SalonJee/ytmusic_volume_fade.git
+```
+## unpack the extension in your browser
+
+for Brave go to 
+
+```bash
+brave://extensions
+```
+
+1. "load unpacked"
+2. select the cloned folder
+3. turn on the extension toggle 
+
+done ! can use it now .
+

@@ -38,19 +38,26 @@
     gainNode.gain.setValueAtTime(0.0001, now);
   }
 
-  function fadeIn() {
-    if (!enabled) return;
-    if (!gainNode || !audioCtx) return;
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-
+  function doFade() {
     const now = audioCtx.currentTime;
     const total = settings.fadeDurationMs / 1000;
-
     gainNode.gain.cancelScheduledValues(now);
     gainNode.gain.setValueAtTime(0.0001, now);
     gainNode.gain.exponentialRampToValueAtTime(0.10, now + total * 0.15);
     gainNode.gain.exponentialRampToValueAtTime(0.20, now + total * 0.40);
     gainNode.gain.exponentialRampToValueAtTime(1.0, now + total);
+  }
+
+  function fadeIn() {
+    if (!enabled) return;
+    if (!gainNode || !audioCtx) return;
+    // audioCtx.resume() is async — schedule gain AFTER context is running
+    // so that currentTime is accurate and ramps fire correctly every time
+    if (audioCtx.state === 'suspended') {
+      audioCtx.resume().then(doFade);
+    } else {
+      doFade();
+    }
   }
 
   function setEnabled(val) {
@@ -73,7 +80,7 @@
 
     media.addEventListener('pause', resetGainLow);
     media.addEventListener('ended', resetGainLow);
-    media.addEventListener('waiting', resetGainLow);
+    // 'waiting' removed: fires during normal buffering and would silence audio mid-play
     media.addEventListener('play', fadeIn);
     media.addEventListener('playing', fadeIn);
 

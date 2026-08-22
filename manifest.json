@@ -3,17 +3,38 @@
   "name": "Audio Fade In",
   "version": "2.0.0",
   "description": "Smoothly fades audio in on any website. Enable it per-site from the popup.",
-  "permissions": ["storage", "activeTab", "tabs"],
-  "host_permissions": ["<all_urls>"],
+  "permissions": [
+    "storage",
+    "activeTab",
+    "tabs"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "icons": {
+    "16": "images/logo.png",
+    "48": "images/logo.png",
+    "128": "images/logo.png"
+  },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["content.js"],
-      "run_at": "document_idle"
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "all_frames": true
     }
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Audio Fade In"
+    "default_title": "Audio Fade In",
+    "default_icon": {
+      "16": "images/logo.png",
+      "48": "images/logo.png",
+      "128": "images/logo.png"
+    }
   }
 }

@@ -1,5 +1,5 @@
 // Audio Fade In - Universal per-site fade
-// Activates only on sites explicitly enabled by the user.
+// Uses Web Audio API for sites that support it (YouTube, YouTube Music, etc.)
 
 (function () {
   const DEFAULTS = { fadeDurationMs: 2500 };
@@ -12,20 +12,19 @@
   // --- Audio context state ---
   let audioCtx = null;
   let gainNode = null;
-  let observedVideo = null;
+  let observedMedia = null;
 
-  // --- Fade logic ---
-  function setupAudioContext(video) {
+  function setupAudioContext(media) {
     if (audioCtx) return;
     try {
       audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-      const source = audioCtx.createMediaElementSource(video);
+      const source = audioCtx.createMediaElementSource(media);
       gainNode = audioCtx.createGain();
       source.connect(gainNode);
       gainNode.connect(audioCtx.destination);
       gainNode.gain.value = 0.0001;
     } catch (e) {
-      console.warn('[Fade In] Web Audio setup failed:', e);
+      console.warn('[Audio Fade In] Web Audio setup failed:', e);
       audioCtx = null;
       gainNode = null;
     }
@@ -56,46 +55,42 @@
   function setEnabled(val) {
     enabled = val;
     if (!enabled && gainNode && audioCtx) {
-      // Instantly restore full volume when disabled so it doesn't stay silent
       const now = audioCtx.currentTime;
       gainNode.gain.cancelScheduledValues(now);
       gainNode.gain.setValueAtTime(1.0, now);
     }
   }
 
-  // --- Video attachment ---
-  function attachListeners(video) {
-    if (observedVideo === video) return;
-    observedVideo = video;
+  function attachListeners(media) {
+    if (observedMedia === media) return;
+    observedMedia = media;
 
-    setupAudioContext(video);
+    setupAudioContext(media);
 
-    video.addEventListener('pause', resetGainLow);
-    video.addEventListener('ended', resetGainLow);
-    video.addEventListener('waiting', resetGainLow);
-    video.addEventListener('play', fadeIn);
-    video.addEventListener('playing', fadeIn);
+    media.addEventListener('pause', resetGainLow);
+    media.addEventListener('ended', resetGainLow);
+    media.addEventListener('waiting', resetGainLow);
+    media.addEventListener('play', fadeIn);
+    media.addEventListener('playing', fadeIn);
 
-    if (!video.paused && enabled) fadeIn();
+    if (!media.paused && enabled) fadeIn();
   }
 
-  function findVideo() {
-    const video = document.querySelector('video');
-    if (video && video !== observedVideo) attachListeners(video);
+  function findMedia() {
+    const media = document.querySelector('video, audio');
+    if (media && media !== observedMedia) attachListeners(media);
   }
 
-  // --- Init: load settings & per-site enabled state ---
   chrome.storage.sync.get([...Object.keys(DEFAULTS), storageEnabledKey], (stored) => {
     settings = { fadeDurationMs: stored.fadeDurationMs ?? DEFAULTS.fadeDurationMs };
     const isEnabled = stored[storageEnabledKey] !== undefined ? stored[storageEnabledKey] : true;
     setEnabled(isEnabled);
 
-    findVideo();
-    const observer = new MutationObserver(findVideo);
+    findMedia();
+    const observer = new MutationObserver(findMedia);
     observer.observe(document.documentElement, { childList: true, subtree: true });
   });
 
-  // --- Listen for real-time changes from popup ---
   chrome.storage.onChanged.addListener((changes) => {
     if (changes.fadeDurationMs) {
       settings.fadeDurationMs = changes.fadeDurationMs.newValue;

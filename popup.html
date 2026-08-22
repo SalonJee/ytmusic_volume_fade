@@ -4,54 +4,185 @@
 <head>
   <meta charset="utf-8" />
   <style>
+    * {
+      box-sizing: border-box;
+    }
+
     body {
       font-family: system-ui, -apple-system, sans-serif;
-      width: 240px;
-      padding: 14px;
+      width: 260px;
       margin: 0;
+      background: #111;
+      color: #eee;
     }
 
-    h3 {
-      margin: 0 0 12px;
-      font-size: 14px;
+    .header {
+      padding: 14px 14px 10px;
+      border-bottom: 1px solid #222;
     }
 
-    label {
-      display: block;
-      margin-top: 12px;
+    .header h3 {
+      margin: 0;
+      font-size: 13px;
+      font-weight: 600;
+      color: #fff;
+      letter-spacing: 0.02em;
+    }
+
+    .site-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      border-bottom: 1px solid #222;
+    }
+
+    .site-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      overflow: hidden;
+    }
+
+    .site-label {
+      font-size: 10px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .site-name {
       font-size: 12px;
-      color: #444;
+      font-weight: 500;
+      color: #ddd;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 160px;
     }
 
-    .value {
-      float: right;
-      color: #888;
+    /* Toggle switch */
+    .toggle-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-shrink: 0;
+    }
+
+    .toggle-status {
+      font-size: 11px;
+      color: #555;
+      transition: color 0.2s;
+    }
+
+    .toggle-status.on {
+      color: #4ade80;
+    }
+
+    .toggle {
+      position: relative;
+      width: 40px;
+      height: 22px;
+    }
+
+    .toggle input {
+      display: none;
+    }
+
+    .slider {
+      position: absolute;
+      inset: 0;
+      background: #333;
+      border-radius: 22px;
+      cursor: pointer;
+      transition: background 0.25s;
+    }
+
+    .slider::before {
+      content: '';
+      position: absolute;
+      width: 16px;
+      height: 16px;
+      left: 3px;
+      top: 3px;
+      background: #fff;
+      border-radius: 50%;
+      transition: transform 0.25s;
+    }
+
+    input:checked+.slider {
+      background: #4ade80;
+    }
+
+    input:checked+.slider::before {
+      transform: translateX(18px);
+    }
+
+    .duration-section {
+      padding: 12px 14px 14px;
+    }
+
+    .duration-label {
+      display: flex;
+      justify-content: space-between;
+      font-size: 11px;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .duration-label span:last-child {
+      color: #aaa;
+      font-weight: 500;
     }
 
     input[type="range"] {
       width: 100%;
-      margin-top: 4px;
+      accent-color: #4ade80;
+      cursor: pointer;
     }
 
-    p.hint {
-      font-size: 11px;
-      color: #999;
-      margin-top: 14px;
-      line-height: 1.4;
+    .hint {
+      font-size: 10px;
+      color: #444;
+      margin-top: 8px;
+      line-height: 1.5;
+    }
+
+    .disabled-overlay {
+      opacity: 0.4;
+      pointer-events: none;
+      transition: opacity 0.2s;
     }
   </style>
 </head>
 
 <body>
-  <h3>🎧 Fade In Settings</h3>
+  <div class="header">
+    <h3>🎧 Audio Fade In</h3>
+  </div>
 
-  <label>Fade duration <span class="value" id="durationValue"></span></label>
-  <input type="range" id="duration" min="500" max="6000" step="100" />
+  <div class="site-row">
+    <div class="site-info">
+      <span class="site-label">Current site</span>
+      <span class="site-name" id="siteName">loading…</span>
+    </div>
+    <div class="toggle-wrap">
+      <span class="toggle-status" id="toggleStatus">Off</span>
+      <label class="toggle">
+        <input type="checkbox" id="enabledToggle" />
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
 
-  <p class="hint">
-    Curve: silent → quiet (0.1) → audible (0.2) → full volume.<br>
-    Applies every time playback starts on music.youtube.com.
-  </p>
+  <div class="duration-section" id="durationSection">
+    <div class="duration-label">
+      <span>Fade duration</span>
+      <span id="durationValue"></span>
+    </div>
+    <input type="range" id="duration" min="500" max="6000" step="100" />
+    <p class="hint">silent → quiet → audible → full volume</p>
+  </div>
 
   <script src="popup.js"></script>
 </body>

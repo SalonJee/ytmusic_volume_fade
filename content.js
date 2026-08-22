@@ -35,7 +35,8 @@
     if (!gainNode || !audioCtx) return;
     const now = audioCtx.currentTime;
     gainNode.gain.cancelScheduledValues(now);
-    gainNode.gain.setValueAtTime(0.0001, now);
+    // When disabled, keep gain at 1.0 so audio passes through on resume
+    gainNode.gain.setValueAtTime(enabled ? 0.0001 : 1.0, now);
   }
 
   function doFade() {
@@ -52,7 +53,6 @@
     if (!enabled) return;
     if (!gainNode || !audioCtx) return;
     // audioCtx.resume() is async — schedule gain AFTER context is running
-    // so that currentTime is accurate and ramps fire correctly every time
     if (audioCtx.state === 'suspended') {
       audioCtx.resume().then(doFade);
     } else {
@@ -80,8 +80,9 @@
 
     media.addEventListener('pause', resetGainLow);
     media.addEventListener('ended', resetGainLow);
-    // 'waiting' removed: fires during normal buffering and would silence audio mid-play
-    media.addEventListener('play', fadeIn);
+    // Only 'playing' triggers fade — fires exactly once when audio truly starts rendering.
+    // Using 'play' too caused double-triggers; with rapid seek/skip events the debounce
+    // we had to add then blocked the real fade, locking gain at 0.0001.
     media.addEventListener('playing', fadeIn);
 
     if (!media.paused && enabled) fadeIn();

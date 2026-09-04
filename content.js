@@ -2,11 +2,18 @@
 // Uses Web Audio API for sites that support it (YouTube, YouTube Music, etc.)
 
 (function () {
+  const host = location.hostname.toLowerCase();
+  const isAllowedHost = host === 'youtube.com' || host.endsWith('.youtube.com') || host === 'music.youtube.com' || host.endsWith('.music.youtube.com');
+
+  if (!isAllowedHost) {
+    return;
+  }
+
   const DEFAULTS = { fadeDurationMs: 2500 };
   let settings = { ...DEFAULTS };
   let enabled = false;
 
-  const hostname = location.hostname;
+  const hostname = host;
   const storageEnabledKey = 'enabled_' + hostname;
 
   // --- Audio context state ---

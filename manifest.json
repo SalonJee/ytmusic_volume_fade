@@ -9,7 +9,10 @@
     "tabs"
   ],
   "host_permissions": [
-    "<all_urls>"
+    "*://*.youtube.com/*",
+    "*://youtube.com/*",
+    "*://music.youtube.com/*",
+    "*://*.music.youtube.com/*"
   ],
   "icons": {
     "16": "images/logo.png",
@@ -19,7 +22,10 @@
   "content_scripts": [
     {
       "matches": [
-        "<all_urls>"
+        "*://*.youtube.com/*",
+        "*://youtube.com/*",
+        "*://music.youtube.com/*",
+        "*://*.music.youtube.com/*"
       ],
       "js": [
         "content.js"
